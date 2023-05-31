@@ -30,8 +30,7 @@ def modify_config(switch):
                 f'interface {interface}',
                 'description Wireless AP',
                 'switchmode mode trunk',
-                'switchport trunk native vlan 32',
-                'write mem'
+                'switchport trunk native vlan 32'
                 ]
             #ssh_conn.enable() ## Ask if needed for their environment
             output = ssh_conn.send_config_set(commands,delay_factor=5,max_loops=300)
