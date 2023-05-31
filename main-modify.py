@@ -26,8 +26,13 @@ def modify_config(switch):
     try:
         ssh_conn = ConnectHandler(**switch)
         for interface in command_ports:
-            commands = [f'interface {interface}',
-                        'description test']
+            commands = [f'default interface {interface}'
+                f'interface {interface}',
+                'description Wireless AP',
+                'switchmode mode trunk',
+                'switchport trunk native vlan 32',
+                'write mem'
+                ]
             #ssh_conn.enable() ## Ask if needed for their environment
             output = ssh_conn.send_config_set(commands,delay_factor=5,max_loops=300)
 

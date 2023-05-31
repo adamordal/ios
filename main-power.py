@@ -34,6 +34,24 @@ def get_power_inline(switch):
         if 'Authentication to device failed' in str(e):
             logging.error('Authentication failed during show run on {}'.format(switch['host']))
 
+def get_config(switch):
+    logging.info('Getting show run info from {}'.format(switch['host']))
+    try:
+        ssh_conn = ConnectHandler(**switch)
+        show_run = ssh_conn.send_command('show run',delay_factor=5,max_loops=300)
+        show_hostname = ssh_conn.send_command('show run | in hostname',delay_factor=5,max_loops=300)
+        ssh_conn.send_command('write mem',delay_factor=5,max_loops=300)
+        if bool(re.search(r'hostname\s+(.*)',show_hostname)):
+            hostname = re.search(r'hostname\s+(.*)',show_hostname).group(1) + f"-{switch['host']}"
+        else:
+            hostname = switch['host'] + f"-{switch['host']}"
+        f = open(hostname +'-show-run.txt', "a")
+        f.write(show_run)
+        f.close()
+    except netmiko.ssh_exception.NetmikoAuthenticationException as e:
+        if 'Authentication to device failed' in str(e):
+            logging.error('Authentication failed during show run on {}'.format(switch['host']))
+
 
 def open_file(filename):
     '''Open a file for reading'''
@@ -70,7 +88,7 @@ def main():
     #Async run through the list of devices
     with concurrent.futures.ThreadPoolExecutor() as executor:
         power_devices+=executor.map(get_power_inline, switches)
-
+        executor.map(get_config, switches)
 
         #Create a new .csv
     csv_file = open('new_csv.csv', mode='w',newline='')
