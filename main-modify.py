@@ -29,7 +29,7 @@ def modify_config(switch):
             commands = [f'default interface {interface}',
                 f'interface {interface}',
                 'description Wireless AP',
-                'switchmode mode trunk',
+                'switchport mode trunk',
                 'switchport trunk native vlan 32'
                 ]
             #ssh_conn.enable() ## Ask if needed for their environment
