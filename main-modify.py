@@ -26,7 +26,7 @@ def modify_config(switch):
     try:
         ssh_conn = ConnectHandler(**switch)
         for interface in command_ports:
-            commands = [f'default interface {interface}'
+            commands = [f'default interface {interface}',
                 f'interface {interface}',
                 'description Wireless AP',
                 'switchmode mode trunk',
@@ -34,6 +34,21 @@ def modify_config(switch):
                 ]
             #ssh_conn.enable() ## Ask if needed for their environment
             output = ssh_conn.send_config_set(commands,delay_factor=5,max_loops=300)
+
+        return(output)
+    except netmiko.ssh_exception.NetmikoAuthenticationException as e:
+        if 'Authentication to device failed' in str(e):
+            logging.error('Authentication failed during SCP enable on {}'.format(switch['host']))
+
+    return()
+
+def write_mem(switch):
+    logging.info('Write mem on {}'.format(switch['host']))
+    try:
+        ssh_conn = ConnectHandler(**switch)
+        commands = [f'write mem']                
+        #ssh_conn.enable() ## Ask if needed for their environment
+        output = ssh_conn.send_config_set(commands,delay_factor=5,max_loops=300)
 
         return(output)
     except netmiko.ssh_exception.NetmikoAuthenticationException as e:
@@ -87,6 +102,7 @@ def main():
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(modify_config, switches)
+        executor.map(write_mem, switches)
 
 
 if __name__ == '__main__':
