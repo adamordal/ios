@@ -19,8 +19,7 @@ def get_power_inline(switch):
     logging.info('Getting power info from {}'.format(switch['host']))
     try:
         ssh_conn = ConnectHandler(**switch)
-        result = ssh_conn.send_command("show power inline | inc Gi1/0/12", delay_factor=5,max_loops=300)
-#        result = ssh_conn.send_command("show power inline | inc AIR", delay_factor=5,max_loops=300)
+        result = ssh_conn.send_command("show power inline | inc AIR", delay_factor=5,max_loops=300)
         for line in result.splitlines():
             #Get switch number and switch port
             if bool(re.search(r'(^Gi\S+)',line)):
