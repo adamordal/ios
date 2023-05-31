@@ -17,7 +17,6 @@ logging.basicConfig(filename='switches-{}.log'.format(now), level=logging.INFO)
 device_ports = []
 
 def modify_config(switch):
-    print(switch)
     command_ports = []
     for port in device_ports:
         if port.get('host') == switch['host']:
