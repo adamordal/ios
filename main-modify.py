@@ -102,7 +102,7 @@ def main():
     
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(modify_config, switches)
-        executor.map(write_mem, switches)
+        #executor.map(write_mem, switches)  #Commented out for testing. Needs more work.
 
 
 if __name__ == '__main__':
