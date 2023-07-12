@@ -34,11 +34,10 @@ def modify_config(switch):
                 ]
             #ssh_conn.enable() ## Ask if needed for their environment
             output = ssh_conn.send_config_set(commands,delay_factor=5,max_loops=300)
-
-        return(output)
+            return(output)
     except netmiko.ssh_exception.NetmikoAuthenticationException as e:
         if 'Authentication to device failed' in str(e):
-            logging.error('Authentication failed during SCP enable on {}'.format(switch['host']))
+            logging.error('Authentication failed during port modify on {}'.format(switch['host']))
 
     return()
 
@@ -49,11 +48,10 @@ def write_mem(switch):
         commands = [f'write mem']                
         #ssh_conn.enable() ## Ask if needed for their environment
         output = ssh_conn.send_config_set(commands,delay_factor=5,max_loops=300)
-
         return(output)
     except netmiko.ssh_exception.NetmikoAuthenticationException as e:
         if 'Authentication to device failed' in str(e):
-            logging.error('Authentication failed during SCP enable on {}'.format(switch['host']))
+            logging.error('Authentication failed during write mem on {}'.format(switch['host']))
 
     return()
 
@@ -99,10 +97,12 @@ def main():
                     if v == device['Switch']:
                         item['ports'].append(device['Port'])
 
-    
+    #Asyc make changes
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(modify_config, switches)
-        #executor.map(write_mem, switches)  #Commented out for testing. Needs more work.
+    #Async write mem
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(write_mem, switches)  
 
 
 if __name__ == '__main__':
